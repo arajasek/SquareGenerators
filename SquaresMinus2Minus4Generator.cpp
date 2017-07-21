@@ -5,8 +5,6 @@
 
 using namespace std;
 
-typedef std::pair<int, int> State;
-
 string getAutomatonName(int i, int j, int k) {
 	return("squareChecker"+to_string(i)+"_"+to_string(j)+"_"+to_string(k));
 }
@@ -20,21 +18,22 @@ string getStateName(int a, int b, int c1, int c2, int e) {
 }
 
 void addRStateBTransitions(int twoNumber, string name, int last4, int c1, int c2, int guess) {
-	for(int i = 0; i <= twoNumber; i++) {
-		int lowerBit = (i+ c2 + last4) % 2;
-		int higherBit = (i + c1) % 2;
-		int lowerCarry = (i + c2 + last4) / 2;
-		int higherCarry = (i + c1) / 2;	
-		if (lowerCarry == guess) {
-			if (higherCarry == 2)
-				cout << "(" << name << " b" << higherBit << lowerBit << " s2)\n";
-			if (higherCarry == 3)
-				cout << "(" << name << " b" << higherBit << lowerBit << " s3)\n";
-		}
+	int i = twoNumber;
+	int lowerBit = (i+ c2 + last4) % 2;
+	int higherBit = (i + c1) % 2;
+	int lowerCarry = (i + c2 + last4) / 2;
+	int higherCarry = (i + c1) / 2;	
+	if (lowerCarry == guess) {
+		if (higherCarry == 2)
+			cout << "(" << name << " b" << higherBit << lowerBit << " s2)\n";
+		if (higherCarry == 3)
+			cout << "(" << name << " b" << higherBit << lowerBit << " s3)\n";
 	}
 }
 
-void addSingleStateBTransitions(int twoNumber, string name, int last4, int next4, int c1, int c2, int guess) {
+void addSingleStateBTransitions(int twoNumber, int fourNumber, string name, int last4, int next4, int c1, int c2, int guess) {
+	if(next4 != fourNumber)
+		return;
 	for(int i = 0; i <= twoNumber; i++) {
 		int lowerBit = (i+ c2 + next4) % 2;
 		int higherBit = (i + c1) % 2;
@@ -57,15 +56,15 @@ void addSingleStateTransitions(int twoNumber, int fourNumber, string name, int l
 }
 
 void addAllStateTransitions(int twoNumber, int fourNumber, int guessedCarry) {
-	for(int i = 0; i < twoNumber; i++) 
-		for (int j = 0; j < twoNumber; j++)
+	for(int i = 0; i <= fourNumber; i++) 
+		for (int j = 0; j <= fourNumber; j++)
 			for (int k = 0; k < twoNumber+fourNumber; k++)	
 				for (int l = 0; l < twoNumber+fourNumber; l++) {
 					addSingleStateTransitions(twoNumber, fourNumber, getStateName(i,j,k,l,guessedCarry), i, j, k, l, guessedCarry);
-					addSingleStateBTransitions(twoNumber, getStateName(i,j,k,l,guessedCarry), i, j, k, l, guessedCarry);
+					addSingleStateBTransitions(twoNumber, fourNumber, getStateName(i,j,k,l,guessedCarry), i, j, k, l, guessedCarry);
 					cout << endl;
 				}
-	for(int i = 0; i < twoNumber; i++) 
+	for(int i = 0; i <= fourNumber; i++) 
 		for (int k = 0; k < twoNumber+fourNumber; k++)	
 			for (int l = 0; l < twoNumber+fourNumber; l++) {
 				addRStateBTransitions(twoNumber, getRStateName(i,k,l,guessedCarry), i, k, l, guessedCarry);
@@ -95,12 +94,12 @@ void addQTransitions(int twoNumber, int fourNumber, int guessedCarry) {
 
 void createStates(int twoNumber, int fourNumber, int guessedCarry) {
 	cout << "states = { q\n";
-	for(int i = 0; i < twoNumber; i++) 
-		for (int j = 0; j < twoNumber; j++)
+	for(int i = 0; i <= fourNumber; i++) 
+		for (int j = 0; j <= fourNumber; j++)
 			for (int k = 0; k < twoNumber+fourNumber; k++)	
 				for (int l = 0; l < twoNumber+fourNumber; l++)
 					cout << getStateName(i,j,k,l,guessedCarry) <<endl;	
-	for(int i = 0; i < twoNumber; i++) 
+	for(int i = 0; i <= fourNumber; i++) 
 		for (int k = 0; k < twoNumber+fourNumber; k++)	
 			for (int l = 0; l < twoNumber+fourNumber; l++)
 				cout << getRStateName(i,k,l,guessedCarry) <<endl;	
@@ -122,16 +121,18 @@ void createAutomaton (int twoNumber, int fourNumber, int guessedCarry) {
 int main() {
 	vector<string> autNames;
 	int twoNumber = 4, fourNumber = 3;
-	for (int i = 0; i <= twoNumber; i++) {
+	for (int i = 1; i <= twoNumber; i++) {
 		for (int j = 0; j <= fourNumber; j++) {
+			if (i+j < 3)
+				continue;
 			for (int k = 0; k < (i + j); k++) {
 				createAutomaton(i, j, k);
 				autNames.push_back(getAutomatonName(i,j,k));
 			}
 		}
 	}
-	cout<<endl<<endl<<"FiniteAutomaton finalAut = Intersect(Complement("<<autNames.at(0)<<"), Complement("<<autNames.at(1)<<"));\n";
+	cout<<endl<<endl<<"FiniteAutomaton finalAut = intersect(complement("<<autNames.at(0)<<"), complement("<<autNames.at(1)<<"));\n";
 	for(int i = 2; i < autNames.size(); i++)
-		cout<<"finalAut = Intersect(finalAut, Complement("<<autNames.at(i)<<"));\n";
-	cout<<"finalAut = removeUnreachable(Complement(finalAut));";
+		cout<<"finalAut = intersect(finalAut, complement("<<autNames.at(i)<<"));\n";
+	cout<<"finalAut = removeUnreachable(complement(finalAut));";
 }
