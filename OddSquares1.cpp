@@ -1,17 +1,15 @@
+// every length-n integer, n odd, n >= 13, is the sum of binary squares of
+// length
 
-// Every length-n integer, n odd, n >= 13, is the sum
-// either
+// (A)
+// - exactly one of (n-1) and exactly one of (n-3) OR
+// - exactly 2 of (n-1) and exactly one of (n-3) OR
+// - exactly one of (n-1) and exactly two of (n-3) OR
+// - two exactly of n-1 and two exactly of n-3 OR
 
-// - at most 2 binary squares of length n-1
-// - and at most 2 binary squares of length n-3
-
-// OR
-
-// - at most 2 binary squares of length n-1
-// - and at most 1 binary square of length n-3
-// - and at most 1 binary square of length n-5
-
-// This program generates the code for up to 2 n-1s and up to 2 n-3s
+// (B)
+// - one each exactly of n-1, n-3, n-5 OR
+// - two exactly of n-1, one exactly of n-3, one exactly of n-5 .
 
 #include <iostream>
 #include <string> 
@@ -20,7 +18,7 @@
 
 using namespace std;
 
-class AutomatonGenerator {
+class AutomatonGeneratorA {
 private:
 	string name;
 	int maxCarry;
@@ -35,7 +33,7 @@ private:
 	void addSingleStateDTransitions(int, int, int, int);
 	void addSingleStateETransitions(int, int, int, int);
 public:
-	AutomatonGenerator(int, int, int, bool);
+	AutomatonGeneratorA(int, int, int, bool);
 	void print();
 
 };
@@ -46,7 +44,7 @@ public:
 // n3 squares of length n-5
 // guessed carry of n4
 
-AutomatonGenerator::AutomatonGenerator(int i, int j, int k, bool f) {
+AutomatonGeneratorA::AutomatonGeneratorA(int i, int j, int k, bool f) {
 	string subname = to_string(i) + "_" + to_string(j) + "_0_" + to_string(k);
 	name = "sqChecker_" + subname;
 	maxCarry = i + j - 1;
@@ -61,11 +59,11 @@ AutomatonGenerator::AutomatonGenerator(int i, int j, int k, bool f) {
 // c1 is the upper carry
 // c2 is the lower carry
 
-string AutomatonGenerator::getQStateName(int a, int b, int c1, int c2) {
+string AutomatonGeneratorA::getQStateName(int a, int b, int c1, int c2) {
 	return ("q_"+to_string(a)+"_"+to_string(b)+"_"+to_string(c1)+"_"+to_string(c2));
 }
 
-void AutomatonGenerator::addSingleStateETransitions(int a, int b, int c1, int c2) {
+void AutomatonGeneratorA::addSingleStateETransitions(int a, int b, int c1, int c2) {
 	string name = getQStateName(a,b,c1,c2);
 	int i = oneNumber;
 	int lowerBit = (i+ c2 + a) % 2;
@@ -77,7 +75,7 @@ void AutomatonGenerator::addSingleStateETransitions(int a, int b, int c1, int c2
 	}
 }
 
-void AutomatonGenerator::addSingleStateDTransitions(int a, int b, int c1, int c2) {
+void AutomatonGeneratorA::addSingleStateDTransitions(int a, int b, int c1, int c2) {
 	if(b != threeNumber)
 		return;
 	string name = getQStateName(a,b,c1,c2);
@@ -91,7 +89,7 @@ void AutomatonGenerator::addSingleStateDTransitions(int a, int b, int c1, int c2
 	}
 }
 
-void AutomatonGenerator::addSingleStateABCTransitions(int a, int b, int c1, int c2) {
+void AutomatonGeneratorA::addSingleStateABCTransitions(int a, int b, int c1, int c2) {
 	string name = getQStateName(a,b,c1,c2);
 	for(int i = 0; i <= oneNumber; i++) {
 		for (int j = 0; j <= threeNumber; j++) {		
@@ -107,7 +105,7 @@ void AutomatonGenerator::addSingleStateABCTransitions(int a, int b, int c1, int 
 	}
 }
 
-void AutomatonGenerator::addAllStateTransitions() {
+void AutomatonGeneratorA::addAllStateTransitions() {
 	for(int i = 0; i <= threeNumber; i++) {
 		for (int j = 0; j <= threeNumber; j++) {
 			for (int k = 0; k <= maxCarry; k++)	{
@@ -123,7 +121,7 @@ void AutomatonGenerator::addAllStateTransitions() {
 	cout <<"(s1 f acc)\n}\n);\n";
 }
 
-void AutomatonGenerator::addQTransitions() {
+void AutomatonGeneratorA::addQTransitions() {
 	for(int i = 0; i <= oneNumber; i++) {
 		for (int j = 0; j <= threeNumber; j++) {		
 			for (int k = 0; k <= threeNumber; k++) {
@@ -139,7 +137,7 @@ void AutomatonGenerator::addQTransitions() {
 
 
 
-void AutomatonGenerator::createStates() {
+void AutomatonGeneratorA::createStates() {
 	cout << "states = { q\n";
 	for(int i = 0; i <= threeNumber; i++) 
 		for (int j = 0; j <= threeNumber; j++)
@@ -150,7 +148,7 @@ void AutomatonGenerator::createStates() {
 	cout << "initialStates = {q},\nfinalStates = {acc},\n";
 }
 
-void AutomatonGenerator::print() {
+void AutomatonGeneratorA::print() {
 	cout << "FiniteAutomaton "<<name<<" = (\n";
 	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11\n";
 	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f},\n";
@@ -172,7 +170,7 @@ int main() {
 			if (i+j < 2)
 				continue;
 			for (int k = 0; k < (i + j); k++) {
-				AutomatonGenerator a (i, j ,k, flag);
+				AutomatonGeneratorA a (i, j ,k, flag);
 				a.print();
 				flag = false;
 			}
