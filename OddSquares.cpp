@@ -26,15 +26,16 @@ private:
 	int oneNumber, threeNumber;
 	bool firstAut;
 	string getQStateName(int, int, int, int);
-	void createStates();
 	void addQTransitions();
 	void addAllStateTransitions();
 	void addSingleStateABCTransitions(int, int, int, int);
 	void addSingleStateDTransitions(int, int, int, int);
 	void addSingleStateETransitions(int, int, int, int);
 public:
-	AutomatonGeneratorA(int, int, int, bool);
-	void print();
+	AutomatonGeneratorA(int, int, int);
+	string getInitialState();
+	void createStates();
+	void addTransitions();
 
 };
 
@@ -44,14 +45,13 @@ public:
 // n3 squares of length n-5
 // guessed carry of n4
 
-AutomatonGeneratorA::AutomatonGeneratorA(int i, int j, int k, bool f) {
+AutomatonGeneratorA::AutomatonGeneratorA(int i, int j, int k) {
 	string subname = to_string(i) + "_" + to_string(j) + "_0_" + to_string(k);
 	name = "sqChecker_" + subname;
 	maxCarry = i + j - 1;
 	oneNumber = i;
 	threeNumber = j;
 	guessedCarry = k;
-	firstAut = f;
 }
 
 // Q states are 4-tuples (a,b,c1,c2) where a is the last digit of the n-3 guesses
@@ -60,7 +60,11 @@ AutomatonGeneratorA::AutomatonGeneratorA(int i, int j, int k, bool f) {
 // c2 is the lower carry
 
 string AutomatonGeneratorA::getQStateName(int a, int b, int c1, int c2) {
-	return (name+"_"+to_string(a)+"_"+to_string(b)+"_"+to_string(c1)+"_"+to_string(c2));
+	return (name+"_q_"+to_string(a)+"_"+to_string(b)+"_"+to_string(c1)+"_"+to_string(c2));
+}
+
+string AutomatonGeneratorA::getInitialState() {
+	return (name+"_init");
 }
 
 void AutomatonGeneratorA::addSingleStateETransitions(int a, int b, int c1, int c2) {
@@ -118,10 +122,10 @@ void AutomatonGeneratorA::addAllStateTransitions() {
 			}
 		}
 	}
-	cout <<"(s1 f acc)\n}\n);\n";
 }
 
 void AutomatonGeneratorA::addQTransitions() {
+	string qname = getInitialState();
 	for(int i = 0; i <= oneNumber; i++) {
 		for (int j = 0; j <= threeNumber; j++) {		
 			for (int k = 0; k <= threeNumber; k++) {
@@ -129,37 +133,26 @@ void AutomatonGeneratorA::addQTransitions() {
 				int higherBit = (guessedCarry + i + k) % 2;
 				int lowerCarry = (i+j) / 2;
 				int higherCarry = (guessedCarry + i + k) / 2;
-				cout << "(q a" << higherBit << lowerBit << " " << getQStateName(j, k, higherCarry, lowerCarry)<<")\n";
+				cout << "(" << qname <<" a" << higherBit << lowerBit << " " << getQStateName(j, k, higherCarry, lowerCarry)<<")\n";
 			}
 		}
 	}
 }
 
+void AutomatonGeneratorA::addTransitions() {
+	addQTransitions();
+	addAllStateTransitions();
+}
 
 
 void AutomatonGeneratorA::createStates() {
-	cout << "states = { q\n";
+	cout << getInitialState()<<endl;
 	for(int i = 0; i <= threeNumber; i++) 
 		for (int j = 0; j <= threeNumber; j++)
 			for (int k = 0; k <= maxCarry; k++)	
 				for (int l = 0; l <= maxCarry; l++)
 					cout << getQStateName(i,j,k,l) <<endl;	
-	cout<<"s1 acc},\n";
-	cout << "initialStates = {q},\nfinalStates = {acc},\n";
-}
 
-void AutomatonGeneratorA::print() {
-	cout << "FiniteAutomaton "<<name<<" = (\n";
-	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11\n";
-	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f},\n";
-	createStates();
-	cout << "transitions = {\n";
-	addQTransitions();
-	addAllStateTransitions();
-	if (firstAut) 
-		cout << "FiniteAutomaton finalAut = shrinkNwa(complement("<<name<<"));\n";
-	else
-		cout<< "finalAut = intersect(finalAut, shrinkNwa(complement("<<name<<")));\n";
 }
 
 class AutomatonGeneratorB {
@@ -170,7 +163,6 @@ private:
 	int oneNumber, threeNumber, fiveNumber;
 	string getQStateName(int, int, int, int, int, int, int, int);
 	string getPStateName(int, int, int, int, int, int);
-	void createStates();
 	void addQTransitions();
 	void addPTransitions();
 	void addSinglePTransitions(int, int, int, int, int, int);
@@ -183,7 +175,9 @@ private:
 
 public:
 	AutomatonGeneratorB(int, int, int, int);
-	void print();
+	string getInitialState();
+	void createStates();
+	void addTransitions();
 
 };
 
@@ -202,14 +196,6 @@ AutomatonGeneratorB::AutomatonGeneratorB(int i, int j, int k, int l) {
 	fiveNumber = k;
 	guessedCarry = l;
 }
-
-// // R states are 4-tuples (a,b,c1,c2,e) where a is the last digit of the n-3 guesses
-// // c1 is the upper carry
-// // c2 is the lower carry
-
-// string AutomatonGeneratorB::getRStateName(int a, int c1, int c2) {
-// 	return ("r_"+to_string(a)+"_"+to_string(c1)+"_"+to_string(c2));
-// }
 
 // P states are 6-tuples (a,b,u,w,c1,c2) where a is the last digit of the n-3 guesses
 // b is the next guessed n-3 digit
@@ -235,14 +221,18 @@ string AutomatonGeneratorB::getQStateName(int a, int b, int u, int v, int w, int
 	return (name+"_q_"+to_string(a)+"_"+to_string(b)+"_"+to_string(u)+"_"+to_string(v)+"_"+to_string(w)+"_"+to_string(x)+"_"+to_string(c1)+"_"+to_string(c2));
 }
 
+string AutomatonGeneratorB::getInitialState() {
+	return (name+"_init");
+}
+
 void AutomatonGeneratorB::addSingleStateETransitions(int a, int b, int u, int v, int w, int x, int c1, int c2) {
 	if ((w != fiveNumber) || (x != fiveNumber) || (b != threeNumber))
 		return;
 	int i = oneNumber;
 	string name = getQStateName(a,b,u,v,w,x,c1,c2);
-	int lowerBit = (i+ c2 + a + u) % 2;
+	int lowerBit = (i+ c2 + a + v) % 2;
 	int higherBit = (i + c1) % 2;
-	int lowerCarry = (i + c2 + a + u) / 2;
+	int lowerCarry = (i + c2 + a + v) / 2;
 	int higherCarry = (i + c1) / 2;	
 	if ((lowerCarry == guessedCarry) && (higherCarry == 1))
 		cout << "(" << name << " e" << higherBit << lowerBit << " s1)\n";
@@ -253,9 +243,9 @@ void AutomatonGeneratorB::addSingleStateDTransitions(int a, int b, int u, int v,
 		return;
 	string name = getQStateName(a,b,u,v,w,x,c1,c2);
 	for(int i = 0; i <= oneNumber; i++) {
-		int lowerBit = (i+ c2 + b + v) % 2;
+		int lowerBit = (i+ c2 + b + u) % 2;
 		int higherBit = (i + c1) % 2;
-		int lowerCarry = (i + c2 + b + v) / 2;
+		int lowerCarry = (i + c2 + b + u) / 2;
 		int higherCarry = (i + c1) / 2;	
 		cout << "(" << name << " d" << higherBit << lowerBit << " " << getQStateName(a, b, u, v, x, x, higherCarry, lowerCarry)<<")\n";
 	}
@@ -327,9 +317,7 @@ void AutomatonGeneratorB::addAllStateTransitions() {
 				}
 			}
 		}
-
 	}
-	cout <<"(s1 f acc)\n}\n);\n";
 }
 
 void AutomatonGeneratorB::addSinglePTransitions(int a, int b, int u, int v, int c1, int c2) {
@@ -342,7 +330,7 @@ void AutomatonGeneratorB::addSinglePTransitions(int a, int b, int u, int v, int 
 					int higherBit = (i + j + m +c1) % 2;
 					int lowerCarry = (i+b+l+c2) / 2;
 					int higherCarry = (i + j + m +c1) / 2;
-					cout << "(" << name <<" a" << higherBit << lowerBit << " " << getQStateName(a, b, u, l, v, m, higherCarry, lowerCarry)<<")\n";
+					cout << "(" << name <<" a" << higherBit << lowerBit << " " << getQStateName(a, j, u, l, v, m, higherCarry, lowerCarry)<<")\n";
 				}
 			}
 		}
@@ -366,6 +354,7 @@ void AutomatonGeneratorB::addPTransitions() {
 }
 
 void AutomatonGeneratorB::addQTransitions() {
+	string qname = getInitialState();
 	for(int i = 0; i <= oneNumber; i++) {
 		for (int j = 0; j <= threeNumber; j++) {		
 			for (int k = 0; k <= threeNumber; k++) {
@@ -375,7 +364,7 @@ void AutomatonGeneratorB::addQTransitions() {
 						int higherBit = (guessedCarry + i + k+m) % 2;
 						int lowerCarry = (i+j+l) / 2;
 						int higherCarry = (guessedCarry + i + k+m) / 2;
-						cout << "(q a" << higherBit << lowerBit << " " << getPStateName(j, k, l, m, higherCarry, lowerCarry)<<")\n";
+						cout << "(" << qname <<" a" << higherBit << lowerBit << " " << getPStateName(j, k, l, m, higherCarry, lowerCarry)<<")\n";
 					}
 				}
 			}
@@ -383,8 +372,14 @@ void AutomatonGeneratorB::addQTransitions() {
 	}
 }
 
+void AutomatonGeneratorB::addTransitions() {
+	addPTransitions();
+	addQTransitions();
+	addAllStateTransitions();
+}
+
 void AutomatonGeneratorB::createStates() {
-	cout << "states = { q\n";
+	cout << getInitialState()<<endl;
 	for(int a = 0; a <= threeNumber; a++) 
 		for (int b = 0; b <= threeNumber; b++)
 			for(int u = 0; u <= fiveNumber; u++) 
@@ -402,36 +397,59 @@ void AutomatonGeneratorB::createStates() {
 						for (int l = 0; l <= maxCarry; l++)
 							cout << getPStateName(a,b,u,v,k,l) <<endl;	
 	
-	cout<<"s1 acc},\n";
-	cout << "initialStates = {q},\nfinalStates = {acc},\n";
-}
 
-void AutomatonGeneratorB::print() {
-	cout << "FiniteAutomaton "<<name<<" = (\n";	
-	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11\n";
-	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f},\n";
-	createStates();
-	cout << "transitions = {\n";
-	addQTransitions();
-	addPTransitions();
-	addAllStateTransitions();
- 	cout<< "finalAut = intersect(finalAut, shrinkNwa(complement("<<name<<")));\n";
 }
 
 int main() {
-	bool flag = true;
-	int oneNumber = 2, threeNumber = 2;
-	for (int i = 1; i <= oneNumber; i++) {
-		for (int j = 0; j <= threeNumber; j++) {
-			if (i+j < 2)
-				continue;
-			for (int k = 0; k < (i + j); k++) {
-				AutomatonGeneratorA a (i, j ,k, flag);
-				a.print();
-				flag = false;
-			}
-		}
-	}
-	cout << "finalAut = shrinkNwa(complement(finalAut));\n";
-	cout << "print(numberOfStates(finalAut));\n";
+	vector <AutomatonGeneratorA> va;
+	vector <AutomatonGeneratorB> vb;
+
+	va.push_back(AutomatonGeneratorA(1,1,0));
+	va.push_back(AutomatonGeneratorA(1,1,1));
+	va.push_back(AutomatonGeneratorA(2,1,0));
+	va.push_back(AutomatonGeneratorA(2,1,1));
+	va.push_back(AutomatonGeneratorA(2,1,2));
+	va.push_back(AutomatonGeneratorA(1,2,0));
+	va.push_back(AutomatonGeneratorA(1,2,1));
+	va.push_back(AutomatonGeneratorA(1,2,2));
+	va.push_back(AutomatonGeneratorA(2,2,0));
+	va.push_back(AutomatonGeneratorA(2,2,1));
+	va.push_back(AutomatonGeneratorA(2,2,2));
+	va.push_back(AutomatonGeneratorA(2,2,3));
+	vb.push_back(AutomatonGeneratorB(1,1,1,0));
+	vb.push_back(AutomatonGeneratorB(1,1,1,1));
+	vb.push_back(AutomatonGeneratorB(1,1,1,2));
+	vb.push_back(AutomatonGeneratorB(2,1,1,0));
+	vb.push_back(AutomatonGeneratorB(2,1,1,1));
+	vb.push_back(AutomatonGeneratorB(2,1,1,2));
+	vb.push_back(AutomatonGeneratorB(2,1,1,3));
+
+	cout << "FiniteAutomaton oddSqChecker = (\n";	
+	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11\n";
+	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f},\n";
+
+	cout << "states = {\n";
+	for(int i =0; i < va.size(); i++)
+		va.at(i).createStates();
+	for(int i =0; i < vb.size(); i++)
+		vb.at(i).createStates();
+	cout<<"s1 acc},\n";
+
+	cout << "initialStates = {\n";
+	for(int i =0; i < va.size(); i++)
+		cout << va.at(i).getInitialState()<<endl;
+	for(int i =0; i < vb.size(); i++)
+		cout << vb.at(i).getInitialState()<<endl;
+	cout << "},\nfinalStates = {acc},\n";
+
+	cout << "transitions = {\n";
+	for(int i =0; i < va.size(); i++)
+		va.at(i).addTransitions();
+	for(int i =0; i < vb.size(); i++)
+		vb.at(i).addTransitions();
+
+	cout <<"(s1 f acc)\n}\n);\n";
+
+	cout << "FiniteAutomaton finalAut = shrinkNwa(oddSqChecker);\n";
+	cout << "print(numberOfStates(finalAut));\n\n\n\n\n\n\n\n\n\n";
 }
