@@ -18,6 +18,8 @@
 
 using namespace std;
 
+enum {CREATE_STATES, ADD_TRANSITIONS};
+
 struct State {
 	int secondLastN;
 	int nextHigherN;
@@ -59,9 +61,9 @@ private:
 
 public:
 	AutomatonGenerator(string, bool, bool, bool, bool, bool, int);
-	void createStates();
 	string getStateName(State s);
 	void addTransitions();
+	void loopOverStates(int param);
 };
 
 AutomatonGenerator::AutomatonGenerator (string nm, bool n0, bool nMinusTwo, bool nMinusFour, bool nMinusSix, bool nMinusEight, int gc) {
@@ -92,38 +94,6 @@ string AutomatonGenerator::getStateName(State s) {
 		ret += "_" + to_string(s.secondLastN8) + "_" + to_string(s.lastN8) + "_" + to_string (s.nextLowerN8) + "_" + to_string(s.next2LowerN8);
 
 	return ret+"_"+to_string(s.lowerCarry)+"_"+to_string(s.higherCarry);
-}
-
-void AutomatonGenerator::createStates() {
-	for(int secondLastN = 0; secondLastN <= n; secondLastN++) {
-		for(int nextHigherN = 0; nextHigherN <=n; nextHigherN++) {
-			for(int next2HigherN = 0; next2HigherN <=n; next2HigherN++) {
-				for(int nextHigherN2 = 0; nextHigherN2 <=n2; nextHigherN2++) {
-					for(int lastN6 = 0; lastN6 <= n6; lastN6++) {
-						for(int nextLowerN6 = 0; nextLowerN6 <= n6; nextLowerN6++) {
-							for(int secondLastN8 = 0; secondLastN8 <= n8; secondLastN8++) {
-								for(int lastN8 = 0; lastN8 <=n8; lastN8++) {
-									for(int nextLowerN8 = 0; nextLowerN8 <=n8; nextLowerN8++) {
-										for(int next2LowerN8 = 0; next2LowerN8 <=n8; next2LowerN8++) {
-											for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
-												for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {	
-											cout << getStateName(State(secondLastN,
-												nextHigherN,next2HigherN,
-												nextHigherN2,lastN6,
-												nextLowerN6,secondLastN8,lastN8,
-												nextLowerN8, next2LowerN8, lowerCarry, higherCarry)) <<endl;	
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}	
-			}			
-		}
-	}
 }
 
 void AutomatonGenerator::addStateTransitions(State s) {
@@ -192,6 +162,41 @@ void AutomatonGenerator::addTransitions() {
 	}
 }
 
+void AutomatonGenerator::loopOverStates(int param) {
+	for(int secondLastN = 0; secondLastN <= n; secondLastN++) {
+		for(int nextHigherN = 0; nextHigherN <=n; nextHigherN++) {
+			for(int next2HigherN = 0; next2HigherN <=n; next2HigherN++) {
+				for(int nextHigherN2 = 0; nextHigherN2 <=n2; nextHigherN2++) {
+					for(int lastN6 = 0; lastN6 <= n6; lastN6++) {
+						for(int nextLowerN6 = 0; nextLowerN6 <= n6; nextLowerN6++) {
+							for(int secondLastN8 = 0; secondLastN8 <= n8; secondLastN8++) {
+								for(int lastN8 = 0; lastN8 <=n8; lastN8++) {
+									for(int nextLowerN8 = 0; nextLowerN8 <=n8; nextLowerN8++) {
+										for(int next2LowerN8 = 0; next2LowerN8 <=n8; next2LowerN8++) {
+											for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
+												for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {
+													if (param == CREATE_STATES) {
+														cout << getStateName(State(secondLastN,
+															nextHigherN,next2HigherN,
+															nextHigherN2,lastN6,
+															nextLowerN6,secondLastN8,lastN8,
+															nextLowerN8, next2LowerN8, lowerCarry, higherCarry)) <<endl;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}	
+			}			
+		}
+	}
+}
+
+
 int main() {
 	vector <AutomatonGenerator> machines;
 
@@ -203,7 +208,7 @@ int main() {
 
 	cout << "states = {\n";
 	for(int i =0; i < machines.size(); i++)
-		machines.at(i).createStates();
+		machines.at(i).loopOverStates(CREATE_STATES);
 	cout<<"acc},\n";
 
 	cout << "initialStates = {\n";
