@@ -198,7 +198,7 @@ void AutomatonGenerator::addGTransitions(State s) {
 void AutomatonGenerator::addFTransitions(State s) {
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			int lowerBit = (lowerN + lowerN2 + n4 + s.lastN6 + s.secondLastN8 + s.lowerCarry) % 2;
 			int lowerCarry = (lowerN + lowerN2 + n4 + s.lastN6 + s.secondLastN8 + s.lowerCarry) / 2;
 			int higherBit = (s.nextHigherN + s.nextHigherN2 + n4 + s.higherCarry) % 2;
@@ -216,7 +216,7 @@ void AutomatonGenerator::addFTransitions(State s) {
 void AutomatonGenerator::addETransitions(State s) {
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lastN8 + s.lowerCarry) % 2;
 				int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lastN8 + s.lowerCarry) / 2;
@@ -234,7 +234,7 @@ void AutomatonGenerator::addETransitions(State s) {
 void AutomatonGenerator::addDTransitions(State s) {
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) % 2;
 				int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) / 2;
@@ -252,7 +252,7 @@ void AutomatonGenerator::addDTransitions(State s) {
 void AutomatonGenerator::addCTransitions(State s) {
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
 					for (int higherN8 = 0; higherN8 <= n8; higherN8++) {
@@ -274,7 +274,7 @@ void AutomatonGenerator::addCTransitions(State s) {
 void AutomatonGenerator::addBTransitions(State s) {
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
 					for (int lowerN8 = 0; lowerN8 <= n8; lowerN8++) {
@@ -299,7 +299,7 @@ void AutomatonGenerator::addATransitions() {
 	string sname = getStateName(State());
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
 		for (int higherN = 0; higherN <= n; higherN++) {
-			for (int lowerN2 = 0; lowerN2 <= n; lowerN2++) {
+			for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 				for (int N4 = 0; N4 <= n4; N4++) {
 					for (int lowerN6 = 0; lowerN6 <= n6; lowerN6++) {
 						for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
