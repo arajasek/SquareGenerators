@@ -59981,7 +59981,7 @@ print(numberOfStates(finalAut));
 FiniteAutomaton SyntaxChecker = (
 alphabet = {a00 a01 a10 a11 b00 b01 b10 b11
 c00 c01 c10 c11 d00 d01 d10 d11 e0 e1 f1},
-     states = {q0 q1 q2 q3 q4 q5 q6 q7 q8 q9 qacc},
+     states = {q0 q1 q2 q3 q4 q5 qacc},
      initialStates = {q0},
      finalStates = {qacc},
      transitions = {
