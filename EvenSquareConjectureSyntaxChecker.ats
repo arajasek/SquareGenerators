@@ -1,0 +1,60 @@
+FiniteAutomaton SyntaxChecker = (
+alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11
+d00 d01 d10 d11 e00 e01 e10 e11 f00 f01 f10 f11 g0 g1 h0 h1 i0 i1 j1},
+     states = {q0 q1 q2 q3 q4 q5 q6 q7 q8 q9 qacc},
+     initialStates = {q0},
+     finalStates = {qacc},
+     transitions = {
+         (q0 a00 q1)
+         (q0 a01 q1)
+         (q0 a10 q1)
+         (q0 a11 q1)
+
+         (q1 b00 q2)
+         (q1 b01 q2)
+         (q1 b10 q2)
+         (q1 b11 q2)
+
+         (q2 c00 q3)
+         (q2 c01 q3)
+         (q2 c10 q3)
+         (q2 c11 q3)
+
+         (q3 c00 q3)
+         (q3 c01 q3)
+         (q3 c10 q3)
+         (q3 c11 q3)
+
+         (q3 d00 q4)
+         (q3 d01 q4)
+         (q3 d10 q4)
+         (q3 d11 q4)
+
+         (q4 e00 q5)
+         (q4 e01 q5)
+         (q4 e10 q5)
+         (q4 e11 q5)
+
+         (q5 f00 q6)
+         (q5 f01 q6)
+         (q5 f10 q6)
+         (q5 f11 q6)
+
+         (q6 g0 q7)
+         (q6 g1 q7)
+
+         (q7 h0 q8)
+         (q7 h1 q8)
+
+         (q8 i0 q9)
+         (q8 i1 q9)
+
+         (q9 j1 qacc)
+     }
+);
+
+FiniteAutomaton diff = difference(SyntaxChecker, evenSqChecker);
+
+//assert(isIncluded(SyntaxChecker, finalAut));
+
+
