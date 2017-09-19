@@ -158,7 +158,7 @@ void AutomatonGenerator::addATransitions() {
 }
 
 void AutomatonGenerator::addFTransitions(State s) {
-	if (!(s.nextLowerN4 == s.lastN4 == s.lowerCarry == s.nextHigherN == 0))
+	if ((s.nextLowerN4 + s.lastN4 + s.lowerCarry + s.nextHigherN) != 0)
 		return;
 	int HigherBit, HigherCarry;
 	string DestName;
@@ -380,8 +380,9 @@ void AutomatonGenerator::addStateTransitions(State s) {
 		addCTransitions(s);
 	if (s.nextLowerN4 == 0)
 		addDTransitions(s);
-	if ((s.nextLowerN4 == s.lastN4 == 0) && (s.lowerCarry == guessedCarry))
+	if (((s.nextLowerN4 + s.lastN4) == 0) && (s.lowerCarry == guessedCarry))
 		addETransitions(s);
+	addFTransitions(s);
 }
 
 void AutomatonGenerator::addTransitions() {
