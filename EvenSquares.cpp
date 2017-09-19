@@ -1,15 +1,10 @@
-// A square of length n
-// B sum of squares of length n, n-4
-// C sum of squares of length n, n-6
-// D sum of squares of length n, n-8
-// E sum of squares of length n, n-4, n-6
-// F sum of squares of length n, n-4, n-8
-// G sum of squares of length n, n-6, n-8
-// H sum of squares of length n-2, n-2, n-4
-// I sum of squares of length n-2, n-2, n-6
-// J sum of squares of length n, n-4, n-6, n-8
-// K sum of squares of length n-2, n-2, n-4, n-4
-// L sum of squares of length n-2, n-2, n-4, n-6
+// Every length-n number, n even, n >= 18 is the sum of
+// either
+
+// A 2 squares of length n-2 and 2 squares of length n-4
+// B 3 squares of length n-2 and 1 square of length n-4
+// C 1 square of length n and 1 square of length n-4 and 1 square of length n-6
+// D 2 squares of length n-2 and 1 square of length n-4 and 1 square of length n-6
 
 #include <iostream>
 #include <string> 
@@ -25,24 +20,15 @@ struct State {
 	int nextHigherN2;
 	int lastN6;
 	int nextLowerN6;
-	int secondLastN8;
-	int lastN8;
-	int nextLowerN8;
-	int next2LowerN8;
 	int lowerCarry;
 	int higherCarry;
-	State(int q = 0, int w = 0, int e = 0, int r = 0, int t = 0, int y = 0, int u = 0, 
-		int i = 0, int o = 0, int p = 0, int a = 0, int s = 0) {
+	State(int q = 0, int w = 0, int e = 0, int r = 0, int t = 0, int y = 0, int a = 0, int s = 0) {
 		secondLastN = q;
 		nextHigherN = w;
 		next2HigherN = e;
 		nextHigherN2 = r;
 		lastN6 = t;
 		nextLowerN6 = y;
-		secondLastN8 = u;
-		lastN8 = i;
-		nextLowerN8 = o;
-		next2LowerN8 = p;
 		lowerCarry = a;
 		higherCarry = s;		
 	}
@@ -51,7 +37,7 @@ struct State {
 class AutomatonGenerator {
 private:
 	string name;
-	int n, n2, n4, n6, n8;
+	int n, n2, n4, n6;
 	int maxCarry;
 	int guessedCarry;
 	void addATransitions();
@@ -63,24 +49,22 @@ private:
 	void addGTransitions(State s);
 	void addHTransitions(State s);
 	void addITransitions(State s);
-	void addJTransitions(State s);
 	void addStateTransitions(State s);
 
 public:
-	AutomatonGenerator(string, int, int, int, int, int, int);
+	AutomatonGenerator(string, int, int, int, int, int);
 	void createStates();
 	string getStateName(State s);
 	void addTransitions();
 };
 
-AutomatonGenerator::AutomatonGenerator (string nm, int n0, int nMinusTwo, int nMinusFour, int nMinusSix, int nMinusEight, int gc) {
+AutomatonGenerator::AutomatonGenerator (string nm, int n0, int nMinusTwo, int nMinusFour, int nMinusSix, int gc) {
 	name = nm + to_string(gc);
 	n = n0;
 	n2 = nMinusTwo;
 	n4 = nMinusFour;
 	n6 = nMinusSix;
-	n8 = nMinusEight;
-	maxCarry = n + n2 + n4 + n6 + n8 - 1;
+	maxCarry = n + n2 + n4 + n6 - 1;
 	guessedCarry = gc;
 }
 
@@ -92,8 +76,6 @@ string AutomatonGenerator::getStateName(State s) {
 		ret += "_" + to_string(s.nextHigherN2);
 	if (n6)
 		ret += "_" + to_string(s.lastN6) + "_" + to_string(s.nextLowerN6);	
-	if (n8)
-		ret += "_" + to_string(s.secondLastN8) + "_" + to_string(s.lastN8) + "_" + to_string (s.nextLowerN8) + "_" + to_string(s.next2LowerN8);
 
 	return ret+"_"+to_string(s.lowerCarry)+"_"+to_string(s.higherCarry)+" ";
 }
@@ -105,149 +87,114 @@ void AutomatonGenerator::createStates() {
 				for(int nextHigherN2 = 0; nextHigherN2 <=n2; nextHigherN2++) {
 					for(int lastN6 = 0; lastN6 <= n6; lastN6++) {
 						for(int nextLowerN6 = 0; nextLowerN6 <= n6; nextLowerN6++) {
-							for(int secondLastN8 = 0; secondLastN8 <= n8; secondLastN8++) {
-								for(int lastN8 = 0; lastN8 <=n8; lastN8++) {
-									for(int nextLowerN8 = 0; nextLowerN8 <=n8; nextLowerN8++) {
-										for(int next2LowerN8 = 0; next2LowerN8 <=n8; next2LowerN8++) {
-											for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
-												for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {	
-											cout << getStateName(State(secondLastN,
-												nextHigherN,next2HigherN,
-												nextHigherN2,lastN6,
-												nextLowerN6,secondLastN8,lastN8,
-												nextLowerN8, next2LowerN8, lowerCarry, higherCarry)) <<endl;	
-												}
-											}
-										}
-									}
+							for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
+								for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {	
+							cout << getStateName(State(secondLastN,
+								nextHigherN,next2HigherN,
+								nextHigherN2,lastN6,
+								nextLowerN6,lowerCarry, higherCarry)) <<endl;	
 								}
 							}
 						}
 					}
-				}	
-			}			
+				}
+			}
 		}
 	}
-}
+}	
 
 void AutomatonGenerator::addStateTransitions(State s) {
-	if ((s.nextHigherN + s.secondLastN8 + s.nextLowerN8) == 0)
-		addBTransitions(s);
+	addBTransitions(s);
 	addCTransitions(s);
-	if ((s.nextLowerN8 == n8) && (s.next2LowerN8 == 0))
-		addDTransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 == 0) && (s.nextLowerN6 == n6))
-		addETransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 + s.nextLowerN6 + s.lastN8) == 0)
-		addFTransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 + s.nextLowerN6 + 
-		s.lastN8 + s.lastN6 + s.secondLastN8 + s.lowerCarry) == 0)
-		addGTransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 + s.nextLowerN6 + s.nextHigherN2 +
-		s.lastN8 + s.lastN6 + s.secondLastN8 + s.next2HigherN + s.lowerCarry) == 0)
-		addHTransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 + s.nextLowerN6 + 
-		s.lastN8 + s.lastN6 + s.secondLastN8 + s.nextHigherN2 +
-		s.next2HigherN + s.lowerCarry + s.nextHigherN) == 0)
-		addITransitions(s);
-	if ((s.nextLowerN8 + s.next2LowerN8 + s.nextLowerN6 + 
-		s.lastN8 + s.lastN6 + s.secondLastN8 + s.nextHigherN2 +
-		s.next2HigherN + s.lowerCarry + s.nextHigherN + s.secondLastN) == 0)
-		addJTransitions(s);
+	addDTransitions(s);
+	addETransitions(s);
+	addFTransitions(s);
+	addGTransitions(s);
+	addHTransitions(s);
+	addITransitions(s);
 }
 
-void AutomatonGenerator::addJTransitions(State s) {
+void AutomatonGenerator::addITransitions(State s) {\
+	if ((s.lowerCarry + s.nextLowerN6 + s.lastN6 + s.nextHigherN2 + s.next2HigherN + s.nextHigherN + s.secondLastN) != 0)
+		return;
 	string sname = getStateName(s);
 	int higherBit = (n + s.higherCarry) % 2;
 	int higherCarry = (n + s.higherCarry) / 2;
 	if ((higherBit != 1) || (higherCarry != 0))
 		return;
-	cout << "(" << sname << "j" << higherBit <<" acc)\n";
+	cout << "(" << sname << "i" << higherBit <<" acc)\n";
 }
 
-void AutomatonGenerator::addITransitions(State s) {
+void AutomatonGenerator::addHTransitions(State s) {
+	if ((s.lowerCarry + s.nextLowerN6 + s.lastN6 + s.nextHigherN2 + s.next2HigherN + s.nextHigherN) != 0)
+		return;
 	string sname = getStateName(s);
 	int higherBit = (s.secondLastN + s.higherCarry) % 2;
 	int higherCarry = (s.secondLastN + s.higherCarry) / 2;
 	string destName = getStateName(State(0, 
-		0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, higherCarry));
-	cout << "(" << sname << "i" << higherBit << destName <<")\n";
-}
-
-void AutomatonGenerator::addHTransitions(State s) {
-	string sname = getStateName(s);
-	int higherBit = (s.nextHigherN + n2 + s.higherCarry) % 2;
-	int higherCarry = (s.nextHigherN + n2 + s.higherCarry) / 2;
-	string destName = getStateName(State(s.secondLastN, 
-		0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, higherCarry));
+		0, 0, 0, 0, 0, 0, higherCarry));
 	cout << "(" << sname << "h" << higherBit << destName <<")\n";
 }
 
 void AutomatonGenerator::addGTransitions(State s) {
+	if ((s.lowerCarry + s.nextLowerN6 + s.lastN6 + s.nextHigherN2 + s.next2HigherN) != 0)
+		return;
 	string sname = getStateName(s);
-	int higherBit = (s.nextHigherN + s.nextHigherN2 + s.higherCarry) % 2;
-	int higherCarry = (s.nextHigherN + s.nextHigherN2 + s.higherCarry) / 2;
+	int higherBit = (s.nextHigherN + n2 + s.higherCarry) % 2;
+	int higherCarry = (s.nextHigherN + n2 + s.higherCarry) / 2;
 	string destName = getStateName(State(s.secondLastN, 
-		s.next2HigherN, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, higherCarry));
+		0, 0, 0, 0, 0, 0, higherCarry));
 	cout << "(" << sname << "g" << higherBit << destName <<")\n";
 }
 
 void AutomatonGenerator::addFTransitions(State s) {
+	if ((s.lowerCarry + s.nextLowerN6 + s.lastN6) != 0)
+		return;
+	string sname = getStateName(s);
+	int higherBit = (s.nextHigherN + s.nextHigherN2 + s.higherCarry) % 2;
+	int higherCarry = (s.nextHigherN + s.nextHigherN2 + s.higherCarry) / 2;
+	string destName = getStateName(State(s.secondLastN, 
+		s.next2HigherN, 0, 0, 0, 0, 0, higherCarry));
+	cout << "(" << sname << "f" << higherBit << destName <<")\n";
+}
+
+void AutomatonGenerator::addETransitions(State s) {
+	if (s.nextLowerN6 != 0)
+		return;
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
 		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
-			int lowerBit = (lowerN + lowerN2 + n4 + s.lastN6 + s.secondLastN8 + s.lowerCarry) % 2;
-			int lowerCarry = (lowerN + lowerN2 + n4 + s.lastN6 + s.secondLastN8 + s.lowerCarry) / 2;
+			int lowerBit = (lowerN + lowerN2 + n4 + s.lastN6 + s.lowerCarry) % 2;
+			int lowerCarry = (lowerN + lowerN2 + n4 + s.lastN6 + s.lowerCarry) / 2;
 			int higherBit = (s.nextHigherN + s.nextHigherN2 + n4 + s.higherCarry) % 2;
 			int higherCarry = (s.nextHigherN + s.nextHigherN2 + n4 + s.higherCarry) / 2;
 			if (lowerCarry != guessedCarry)
-				return;
+				continue;
 			string destName = getStateName(State(s.secondLastN, 
-				s.next2HigherN, lowerN, lowerN2, 0, 0,
-				0, 0, 0, 0, 0, higherCarry));
-			cout << "(" << sname << "f" << higherBit << lowerBit << destName <<")\n";
+				s.next2HigherN, lowerN, lowerN2, 0, 0, 0, higherCarry));
+			cout << "(" << sname << "e" << higherBit << lowerBit << destName <<")\n";
 		}		
 	}								
 }		
 
-void AutomatonGenerator::addETransitions(State s) {
+void AutomatonGenerator::addDTransitions(State s) {
+	if (s.nextLowerN6 != n6)
+		return;
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
 		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
-				int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lastN8 + s.lowerCarry) % 2;
-				int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lastN8 + s.lowerCarry) / 2;
+				int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) % 2;
+				int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) / 2;
 				int higherBit = (s.nextHigherN + s.nextHigherN2 + N4 + s.higherCarry) % 2;
 				int higherCarry = (s.nextHigherN + s.nextHigherN2 + N4 + s.higherCarry) / 2;
 				string destName = getStateName(State(s.secondLastN, 
-					s.next2HigherN, lowerN, lowerN2, s.lastN6, 0,
-					s.secondLastN8, 0, 0, 0, lowerCarry, higherCarry));
-				cout << "(" << sname << "e" << higherBit << lowerBit << destName <<")\n";
-			}		
-		}								
-	}		
-}	
-
-void AutomatonGenerator::addDTransitions(State s) {
-	string sname = getStateName(s);
-	for (int lowerN = 0; lowerN <= n; lowerN++) {
-		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
-			for (int N4 = 0; N4 <= n4; N4++) {
-				int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) % 2;
-				int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) / 2;
-				int higherBit = (s.nextHigherN + s.nextHigherN2 + N4 + n6 + s.higherCarry) % 2;
-				int higherCarry = (s.nextHigherN + s.nextHigherN2 + N4 + n6 + s.higherCarry) / 2;
-				string destName = getStateName(State(s.secondLastN, 
-					s.next2HigherN, lowerN, lowerN2, s.lastN6, n6,
-					s.secondLastN8, s.lastN8, 0, 0, lowerCarry, higherCarry));
+					s.next2HigherN, lowerN, lowerN2, s.lastN6, 0, lowerCarry, higherCarry));
 				cout << "(" << sname << "d" << higherBit << lowerBit << destName <<")\n";
 			}		
 		}								
 	}		
-}		
+}	
 
 void AutomatonGenerator::addCTransitions(State s) {
 	string sname = getStateName(s);
@@ -255,45 +202,39 @@ void AutomatonGenerator::addCTransitions(State s) {
 		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
-					for (int higherN8 = 0; higherN8 <= n8; higherN8++) {
-						int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) % 2;
-						int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.nextLowerN8 + s.lowerCarry) / 2;
-						int higherBit = (s.nextHigherN + s.nextHigherN2 + N4 + higherN6 + higherN8 + s.higherCarry) % 2;
-						int higherCarry = (s.nextHigherN + s.nextHigherN2 + N4 + higherN6 + higherN8 + s.higherCarry) / 2;
-						string destName = getStateName(State(s.secondLastN, 
-							s.next2HigherN, lowerN, lowerN2, s.lastN6, higherN6,
-							s.secondLastN8, s.lastN8, s.next2LowerN8, higherN8, lowerCarry, higherCarry));
-						cout << "(" << sname << "c" << higherBit << lowerBit << destName <<")\n";
-					}		
-				}								
-			}		
+					int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) % 2;
+					int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) / 2;
+					int higherBit = (s.nextHigherN + s.nextHigherN2 + N4 + higherN6 + s.higherCarry) % 2;
+					int higherCarry = (s.nextHigherN + s.nextHigherN2 + N4 + higherN6 + s.higherCarry) / 2;
+					string destName = getStateName(State(s.secondLastN, 
+						s.next2HigherN, lowerN, lowerN2, s.lastN6, higherN6, lowerCarry, higherCarry));
+					cout << "(" << sname << "c" << higherBit << lowerBit << destName <<")\n";
+				}		
+			}								
 		}		
-	}	
-}			
+	}		
+}		
 
 void AutomatonGenerator::addBTransitions(State s) {
+	if ((s.nextHigherN) != 0)
+		return;
 	string sname = getStateName(s);
 	for (int lowerN = 0; lowerN <= n; lowerN++) {
 		for (int lowerN2 = 0; lowerN2 <= n2; lowerN2++) {
 			for (int N4 = 0; N4 <= n4; N4++) {
 				for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
-					for (int lowerN8 = 0; lowerN8 <= n8; lowerN8++) {
-						for (int higherN8 = 0; higherN8 <= n8; higherN8++) {
-							int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + lowerN8 + s.lowerCarry) % 2;
-							int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + lowerN8 + s.lowerCarry) / 2;
-							int higherBit = (n + s.nextHigherN2 + N4 + higherN6 + higherN8 + s.higherCarry) % 2;
-							int higherCarry = (n + s.nextHigherN2 + N4 + higherN6 + higherN8 + s.higherCarry) / 2;
-							string destName = getStateName(State(s.secondLastN, 
-								s.next2HigherN, lowerN, lowerN2, s.lastN6, higherN6,
-								lowerN8, s.lastN8, s.next2LowerN8, higherN8, lowerCarry, higherCarry));
-							cout << "(" << sname << "b" << higherBit << lowerBit << destName <<")\n";
-						}		
-					}								
+					int lowerBit = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) % 2;
+					int lowerCarry = (lowerN + lowerN2 + N4 + s.nextLowerN6 + s.lowerCarry) / 2;
+					int higherBit = (n + s.nextHigherN2 + N4 + higherN6 + s.higherCarry) % 2;
+					int higherCarry = (n + s.nextHigherN2 + N4 + higherN6 + s.higherCarry) / 2;
+					string destName = getStateName(State(s.secondLastN, 
+						s.next2HigherN, lowerN, lowerN2, s.lastN6, higherN6, lowerCarry, higherCarry));
+					cout << "(" << sname << "b" << higherBit << lowerBit << destName <<")\n";
 				}		
-			}		
-		}	
-	}			
-}
+			}								
+		}		
+	}		
+}	
 
 void AutomatonGenerator::addATransitions() {
 	string sname = getStateName(State());
@@ -303,25 +244,20 @@ void AutomatonGenerator::addATransitions() {
 				for (int N4 = 0; N4 <= n4; N4++) {
 					for (int lowerN6 = 0; lowerN6 <= n6; lowerN6++) {
 						for (int higherN6 = 0; higherN6 <= n6; higherN6++) {
-							for (int lowerN8 = 0; lowerN8 <= n8; lowerN8++) {
-								for (int higherN8 = 0; higherN8 <= n8; higherN8++) {
-									int lowerBit = (lowerN + lowerN2 + N4 + lowerN6 + lowerN8) % 2;
-									int lowerCarry = (lowerN + lowerN2 + N4 + lowerN6 + lowerN8) / 2;
-									int higherBit = (higherN + n2 + N4 + higherN6 + higherN8 + guessedCarry) % 2;
-									int higherCarry = (higherN + n2 + N4 + higherN6 + higherN8 + guessedCarry) / 2;
-									string destName = getStateName(State(higherN, 
-										0, lowerN, lowerN2, lowerN6, higherN6,
-										0, lowerN8, 0, higherN8, lowerCarry, higherCarry));
-									cout << "(" << sname << "a" << higherBit << lowerBit << destName <<")\n";
-								}		
-							}								
+							int lowerBit = (lowerN + lowerN2 + N4 + lowerN6) % 2;
+							int lowerCarry = (lowerN + lowerN2 + N4 + lowerN6) / 2;
+							int higherBit = (higherN + n2 + N4 + higherN6 + guessedCarry) % 2;
+							int higherCarry = (higherN + n2 + N4 + higherN6 + guessedCarry) / 2;
+							string destName = getStateName(State(higherN, 
+								0, lowerN, lowerN2, lowerN6, higherN6, lowerCarry, higherCarry));
+							cout << "(" << sname << "a" << higherBit << lowerBit << destName <<")\n";
 						}		
-					}		
-				}	
-			}			
-		}		
-	}
-}
+					}								
+				}		
+			}		
+		}	
+	}			
+}		
 
 void AutomatonGenerator::addTransitions() {
 	addATransitions();
@@ -331,70 +267,45 @@ void AutomatonGenerator::addTransitions() {
 				for(int nextHigherN2 = 0; nextHigherN2 <=n2; nextHigherN2++) {
 					for(int lastN6 = 0; lastN6 <= n6; lastN6++) {
 						for(int nextLowerN6 = 0; nextLowerN6 <= n6; nextLowerN6++) {
-							for(int secondLastN8 = 0; secondLastN8 <= n8; secondLastN8++) {
-								for(int lastN8 = 0; lastN8 <=n8; lastN8++) {
-									for(int nextLowerN8 = 0; nextLowerN8 <=n8; nextLowerN8++) {
-										for(int next2LowerN8 = 0; next2LowerN8 <=n8; next2LowerN8++) {
-											for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
-												for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {	
-											addStateTransitions (State(secondLastN,
-												nextHigherN,next2HigherN,
-												nextHigherN2,lastN6,
-												nextLowerN6,secondLastN8,lastN8,
-												nextLowerN8, next2LowerN8, lowerCarry, higherCarry));
-												cout << endl;	
-												}
-											}
-										}
-									}
+							for(int lowerCarry = 0; lowerCarry <=maxCarry; lowerCarry++) {
+								for(int higherCarry = 0; higherCarry <=maxCarry; higherCarry++) {	
+							addStateTransitions (State(secondLastN,
+								nextHigherN,next2HigherN,
+								nextHigherN2,lastN6,
+								nextLowerN6, lowerCarry, higherCarry));
+								cout << endl;	
 								}
 							}
 						}
 					}
-				}	
-			}			
+				}
+			}
 		}
 	}
-}
+}	
 
-void addMachines(string nm, int n0, int nMinusTwo, int nMinusFour, int nMinusSix, int nMinusEight, vector <AutomatonGenerator> &ms) {
-	int maxGC = n0 + nMinusTwo + nMinusFour + nMinusSix + nMinusEight;
+void addMachines(string nm, int n0, int nMinusTwo, int nMinusFour, int nMinusSix, vector <AutomatonGenerator> &ms) {
+	int maxGC = n0 + nMinusTwo + nMinusFour + nMinusSix;
 	for (int i = 0; i < maxGC; i++) {
-		ms.push_back(AutomatonGenerator(nm, n0, nMinusTwo, nMinusFour, nMinusSix, nMinusEight, i));
+		ms.push_back(AutomatonGenerator(nm, n0, nMinusTwo, nMinusFour, nMinusSix, i));
 	}
 } 
 int main() {
 	vector <AutomatonGenerator> machines;
 
-	// A square of length n
-	// B sum of squares of length n, n-4
-	// C sum of squares of length n, n-6
-	// D sum of squares of length n, n-8
-	// E sum of squares of length n, n-4, n-6
-	// F sum of squares of length n, n-4, n-8
-	// G sum of squares of length n, n-6, n-8
-	// H sum of squares of length n-2, n-2, n-4
-	// I sum of squares of length n-2, n-2, n-6
-	// J sum of squares of length n, n-4, n-6, n-8
-	// K sum of squares of length n-2, n-2, n-4, n-4
-	// L sum of squares of length n-2, n-2, n-4, n-6
+	// A 2 squares of length n-2 and 2 squares of length n-4
+	// B 3 squares of length n-2 and 1 square of length n-4
+	// C 1 square of length n and 1 square of length n-4 and 1 square of length n-6
+	// D 2 squares of length n-2 and 1 square of length n-4 and 1 square of length n-6
 
-	addMachines("A", 1, 0, 0, 0, 0, machines);
-	addMachines("B", 1, 0, 1, 0, 0, machines);
-	addMachines("C", 1, 0, 0, 1, 0, machines);
-	addMachines("D", 1, 0, 0, 0, 1, machines);
-	addMachines("E", 1, 0, 1, 1, 0, machines);
-	addMachines("F", 1, 0, 1, 0, 1, machines);
-	addMachines("G", 1, 0, 0, 1, 1, machines);
-	addMachines("H", 0, 2, 1, 0, 0, machines);
-	addMachines("I", 0, 2, 0, 1, 0, machines);
-	addMachines("J", 1, 0, 1, 1, 1, machines);
-	addMachines("K", 0, 2, 2, 0, 0, machines);
-	addMachines("L", 0, 2, 1, 1, 0, machines);
+	addMachines("A", 0, 2, 2, 0, machines);
+	addMachines("B", 0, 3, 1, 0, machines);
+	addMachines("C", 1, 0, 1, 1, machines);
+	addMachines("D", 0, 2, 1, 1, machines);
 
 	cout << "FiniteAutomaton evenSqChecker = (\n";	
 	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11 c00 c01 c10 c11\n";
-	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f00 f01 f10 f11 g0 g1 h0 h1 i0 i1 j1},\n";
+	cout << "d00 d01 d10 d11 e00 e01 e10 e11 f00 f01 f10 f11 g0 g1 h0 h1 i1},\n";
 
 	cout << "states = {\n";
 	for(int i =0; i < machines.size(); i++)
