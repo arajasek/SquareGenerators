@@ -114,7 +114,7 @@ void AutomatonGenerator::addStateTransitions(State s) {
 	addITransitions(s);
 }
 
-void AutomatonGenerator::addITransitions(State s) {\
+void AutomatonGenerator::addITransitions(State s) {
 	if ((s.lowerCarry + s.nextLowerN6 + s.lastN6 + s.nextHigherN2 + s.next2HigherN + s.nextHigherN + s.secondLastN) != 0)
 		return;
 	string sname = getStateName(s);
