@@ -1,4 +1,4 @@
-FiniteAutomaton evenSqChecker = (
+FiniteAutomaton evenGenSqChecker = (
 alphabet = {a00 a01 a10 a11 b00 b01 b10 b11
  c0 c1 d1},
 states = {
@@ -4763,10 +4763,8 @@ transitions = {
 
 }
 );
-FiniteAutomaton finalAut = shrinkNwa(evenSqChecker);
+FiniteAutomaton finalAut = shrinkNwa(evenGenSqChecker);
 print(numberOfStates(finalAut));
-
-
 
 
 FiniteAutomaton SyntaxChecker = (
@@ -4803,11 +4801,17 @@ alphabet = {a00 a01 a10 a11 b00 b01 b10 b11
      }
 );
 
-FiniteAutomaton diff = difference(SyntaxChecker, finalAut);
+//FiniteAutomaton diff = difference(SyntaxChecker, finalAut);
 
 //print(getAcceptedWord(diff));
 
 assert(isIncluded(SyntaxChecker, finalAut));
+
+
+
+
+
+
 
 
 

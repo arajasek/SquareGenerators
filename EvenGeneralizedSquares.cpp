@@ -197,7 +197,7 @@ int main() {
 	machines.push_back(AutomatonGenerator("Aut", 1,1,1,1));
 	machines.push_back(AutomatonGenerator("Aut", 1,1,1,2));
 
-	cout << "FiniteAutomaton evenSqChecker = (\n";	
+	cout << "FiniteAutomaton evenGenSqChecker = (\n";	
 	cout << "alphabet = {a00 a01 a10 a11 b00 b01 b10 b11\n c0 c1 d1},\n";
 
 	cout << "states = {\n";
@@ -218,6 +218,6 @@ int main() {
 
 	cout <<"\n}\n);\n";
 
-	cout << "FiniteAutomaton finalAut = shrinkNwa(evenSqChecker);\n";
+	cout << "FiniteAutomaton finalAut = shrinkNwa(evenGenSqChecker);\n";
 	cout << "print(numberOfStates(finalAut));\n\n\n\n\n\n\n\n\n\n";
 }
